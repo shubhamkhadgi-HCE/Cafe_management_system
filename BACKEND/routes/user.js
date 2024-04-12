@@ -5,7 +5,9 @@ const conn = require('../connection');
 const router = express.Router();
 
 const nodeMailer = require('nodemailer');
-const { text } = require('body-parser');
+
+var auth = require('../services/authentication');
+var checkRole = require('../services/checkRole');
 
 // Create transporter fom mail
 const transporter = nodeMailer.createTransport({
@@ -123,5 +125,70 @@ router.post('/forgotPassword', (req, res) => {
         }
     });
 });
+
+
+router.get('/get', auth.authenticateToken, checkRole.checkRole, (req, res) => {
+    let getUser = "select id, name, email, contactNumber, status from user where role = 'user'";
+    conn.query(getUser, (err, result) => {
+        if (!err) {
+            return res.status(200).json(result);
+        } else {
+            return res.status(500).json({ message: 'Internar server error.' });
+        }
+    })
+});
+
+
+router.patch('/update', auth.authenticateToken, checkRole.checkRole, (req, res) => {
+    let user = req.body;
+    let updateUser = "update user set status = ? where id = ?";
+    const params = [user.status, user.id];
+    conn.query(updateUser, params, (err, result) => {
+        if (!err) {
+            if (result.affectedRows == 0) {
+                return res.status(404).json({ message: "User id does not exist." })
+            } else {
+                return res.status(200).json({ message: "User updated successfully." })
+            }
+        } else {
+            return res.status(500).json({ message: "Internal server error." })
+        }
+    });
+});
+
+
+router.get('/checkToken', auth.authenticateToken, (req, res) => {
+    return res.status(200).json({ message: "true" });
+})
+
+router.post('/changePassword', auth.authenticateToken, (req, res) => {
+    const user = req.body;
+    const email = res.locals.email;
+
+    const getUser = "select * from user where email = ? and password = ?";
+    conn.query(getUser, [email, user.old_password], (err, results) => {
+        if (!err) {
+            if (results.length <= 0) {
+                return res.status(400).json({ message: "Incorrect old password" });
+            } else if (results[0].password == user.old_password) {
+                const updatePass = "update user set password = ? where email = ?";
+                conn.query(updatePass, [user.new_password, email], (err, results) => {
+                    if (!err) {
+                        return res.status(200).json({ message: "Password updated successfully." });
+                    } else {
+                        return res.status(500).json(err);
+                    }
+                });
+            } else {
+                return res.status(400).json({ message: "Something went wrong. please try again later." });
+            }
+        } else {
+            return res.status(500).json({ message: "Internal server error." });
+        }
+    });
+});
+
+
+ 
 
 module.exports = router;
