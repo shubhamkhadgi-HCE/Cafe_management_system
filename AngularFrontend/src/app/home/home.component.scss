@@ -1,0 +1,90 @@
+* {
+    box-sizing: border-box;
+}
+
+/* Style the body */
+body {
+    background-color: #384047;
+}
+
+.wrapper {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e53935;
+}
+
+nav {
+    display: flex;
+    width: 90%;
+}
+
+a.logo {
+    margin-right: auto;
+}
+
+a {
+    text-decoration: none;
+    color: #ffffff;
+    position: relative;
+    font-size: 1.25em;
+}
+
+a::after {
+    content: "";
+    top: 80%;
+    border-bottom: 2px solid #F8E71C;
+    transition: all 0.35s;
+    position: absolute;
+}
+
+a:hover::after {
+    transition: all 0.35s;
+}
+
+a::after {
+    right: 50%;
+    left: 50%;
+}
+
+a:hover::after {
+    right: 0;
+    left: 0;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+}
+
+mat-icon {
+    vertical-align: middle;
+}
+
+.bg-image {
+    /* The image used */
+    background-image: url("../../assets/img/food1.jpg");
+
+    /* Add the blur effect */
+    filter: blur(3px);
+    -webkit-filter: blur(3px);
+
+    /* Full height */
+    height: 100%;
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Footer */
+.footer {
+    padding: 6px;
+    text-align: center;
+    color: white;
+    background: #e53935;
+  }
